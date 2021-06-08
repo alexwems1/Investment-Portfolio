@@ -69,10 +69,21 @@ cat("The average annual portfolio returns is ", round((Por_anual[[1]] * 100),2),
 vola_d <- sd(port_cumulative_ret$port_ret)                    
 cat("The daily portfolio volatility is", round((vola_d),4))
 vola_a <- vola_d *sqrt(252)
-SR <- Por_anual$AnnualizedReturn / vola_a
-SRA <- port_cumulative_ret %>% tq_performance(Ra = port_ret, performance_fun = SharpeRatio.annualized) %>% .[[1]]
-cat("The annual portfolio sharpe ratio calculated using the tq_performance function is", round((SRA),4))
-
 ```
 
 
+It can be seen that the portfolio has a very good performance. With an average annual return that is much higher than financial instruments with high security such as government bonds or debt instruments. In addition, the volatility of the portfolio is quite low, so the risk is clearly reduced. One calculation that is quite valuable is the Sharpe Ratio, which can give us a better idea of the performance of the portfolio. 
+
+
+
+```{r, echo = FALSE}
+SR <- Por_anual$AnnualizedReturn / vola_a
+SRA <- port_cumulative_ret %>% tq_performance(Ra = port_ret, performance_fun = SharpeRatio.annualized) %>% .[[1]]
+cat("The annual portfolio sharpe ratio calculated using the tq_performance function is", round((SRA),4))
+```
+
+***
+
+### Portfolio optimization
+
+Now that the most important statistics about the portfolio are known, we will look for the best combination on the percentage corresponding to each stock. For this, a series of simulations were made in which different combinations are made and the sharpe ratio is measured to know which of them is the ideal one.

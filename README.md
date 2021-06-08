@@ -45,8 +45,26 @@ obtain the cumulative return of the portfolio.
 
     ## [1] "The portfolio return is %"
 
-    ## The average annual portfolio returns is 41.4%
+    ## The average annual portfolio returns is 41.42%
 
     ## The daily portfolio volatility is 0.0173
 
-    ## The annual portfolio sharpe ratio calculated using the tq_performance function is 1.5043
+It can be seen that the portfolio has a very good performance. With an
+average annual return that is much higher than financial instruments
+with high security such as government bonds or debt instruments. In
+addition, the volatility of the portfolio is quite low, so the risk is
+clearly reduced. One calculation that is quite valuable is the Sharpe
+Ratio, which can give us a better idea of the performance of the
+portfolio.
+
+    ## The annual portfolio sharpe ratio calculated using the tq_performance function is 1.5053
+
+------------------------------------------------------------------------
+
+### Portfolio optimization
+
+Now that the most important statistics about the portfolio are known, we
+will look for the best combination on the percentage corresponding to
+each stock. For this, a series of simulations were made in which
+different combinations are made and the sharpe ratio is measured to know
+which of them is the ideal one.
