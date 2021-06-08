@@ -9,6 +9,8 @@ library(tidyquant)
 library(timetk)
 library(dplyr)
 library(ggplot2)
+library(tidyverse)
+
 acciones = c("TSLA","AAPL","AMZN","NFLX","GOOG")
 weights = c(0.25,0.25,0.20,0.15,0.15)
 datos<- acciones %>% tq_get(get = "stock.prices")
@@ -61,7 +63,6 @@ port_cumulative_ret %>%
   scale_y_continuous(breaks = seq(1,2,0.1)) +
   scale_x_date(date_breaks = 'year',
                date_labels = '%Y')
-print("The portfolio return is %")
 Por_anual <- port_cumulative_ret %>% 
   tq_performance(Ra = port_ret,
                  performance_fun = Return.annualized)
@@ -86,4 +87,52 @@ cat("The annual portfolio sharpe ratio calculated using the tq_performance funct
 
 ### Portfolio optimization
 
-Now that the most important statistics about the portfolio are known, we will look for the best combination on the percentage corresponding to each stock. For this, a series of simulations were made in which different combinations are made and the sharpe ratio is measured to know which of them is the ideal one.
+Now that the most important statistics about the portfolio are known, we will look for the best combination on the percentage corresponding to each stock. For this purpose, a series of simulations were made in which different combinations were made and the minimum variance was measured.
+
+
+```{r, echo = FALSE}
+tickers_prices <- acciones %>% tq_get(get = "stock.prices")
+ret_log <- tickers_prices %>% group_by(symbol) %>%
+  tq_transmute(select     = adjusted,
+               mutate_fun = periodReturn, 
+               period     = "daily", 
+               type       = "log",
+               col_rename = "ret_log")
+new_tib <-spread(ret_log, symbol, ret_log)
+sin_na <- replace_na(new_tib,list(FB = 0.0, PDD = 0.0))
+vec_prom_retl <- sin_na
+vec_prom_retl$date <- NULL
+vec_prom_retl
+for_cov <- vec_prom_retl
+promedio_cols<- colMeans(vec_prom_retl)
+weight_new <- matrix(ncol = length(weights))
+r_period <- matrix(nrow = 5000)
+port_risk <- matrix(nrow = 5000)
+shar_ratio <- matrix(nrow = 5000)
+
+for (i in c(1:5000)) {
+  random <- runif(length(weights))
+  wei_norm <- random/sum(random)
+  weight_new <- rbind(wei_norm,weight_new)
+  retorno_total_random <- wei_norm * promedio_cols
+  r_period[i] <- sum(retorno_total_random)
+  r_annual <- (1+r_period)**(251)
+  cov_mat <- cov(for_cov)
+  port_risk[i] <- sqrt(t(array(wei_norm)) %*% (cov_mat %*% array(wei_norm)))
+  shar_ratio[i] <- r_period[i] / port_risk[i]
+}
+weight_new <- weight_new[1:5000,1:5]
+new_matrix<- cbind(weight_new,r_period, port_risk,shar_ratio )
+colnames(new_matrix) <- c(acciones,"Return", "Risk", "SharpeRatio")
+port_nuevo <- as_tibble(new_matrix)
+Riesgo_min <- subset(port_nuevo, Risk == min(port_nuevo$Risk))
+Riesgo_max <- subset(port_nuevo, Risk == max(port_nuevo$Risk))
+plot_max <- c()
+plot_min <- c()
+for (j in c(1:length(acciones))) {
+  plot_max[j] <- as.numeric(Riesgo_max[j])
+  plot_min[j] <- as.numeric(Riesgo_min[j])   
+}
+barplot(plot_max, names.arg = acciones , xlab = "Assets", ylab= "Weights", main = "Maximun Variance")
+barplot(plot_min, names.arg = acciones , xlab = "Assets", ylab= "Weights", main = "Minimum Variance")
+```

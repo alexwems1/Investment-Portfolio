@@ -43,8 +43,6 @@ obtain the cumulative return of the portfolio.
 
 ![](README_files/figure-gfm/pressure-1.png)<!-- -->
 
-    ## [1] "The portfolio return is %"
-
     ## The average annual portfolio returns is 41.42%
 
     ## The daily portfolio volatility is 0.0173
@@ -65,6 +63,22 @@ portfolio.
 
 Now that the most important statistics about the portfolio are known, we
 will look for the best combination on the percentage corresponding to
-each stock. For this, a series of simulations were made in which
-different combinations are made and the sharpe ratio is measured to know
-which of them is the ideal one.
+each stock. For this purpose, a series of simulations were made in which
+different combinations were made and the minimum variance was measured.
+
+    ## # A tibble: 2,624 x 5
+    ##         AAPL     AMZN      GOOG       NFLX     TSLA
+    ##        <dbl>    <dbl>     <dbl>      <dbl>    <dbl>
+    ##  1  0         0        0         0          0      
+    ##  2  0.00521   0.00428 -0.00370   0.0165     0.00188
+    ##  3  0.00815   0.0129   0.0115   -0.00908    0.00598
+    ##  4 -0.000809 -0.00836  0.00725  -0.00973    0.0384 
+    ##  5  0.00714  -0.00199  0.00478   0.00733    0.0128 
+    ##  6  0.0187   -0.00438 -0.00362   0.0467     0.00741
+    ##  7 -0.00237  -0.00184  0.00293  -0.00657   -0.0538 
+    ##  8  0.00810  -0.00141  0.00140   0.0120     0      
+    ##  9  0.00365   0.00785 -0.000292  0.0136    -0.0278 
+    ## 10  0.00807   0.0172   0.0121   -0.0000522 -0.0181 
+    ## # … with 2,614 more rows
+
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
