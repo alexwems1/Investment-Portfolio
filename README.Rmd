@@ -5,31 +5,74 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+library(tidyquant)
+library(timetk)
+library(dplyr)
+library(ggplot2)
+acciones = c("TSLA","AAPL","AMZN","NFLX","GOOG")
+weights = c(0.25,0.25,0.20,0.15,0.15)
+datos<- acciones %>% tq_get(get = "stock.prices")
 ```
 
-# Investment-Portfolio
+# Investment-Portfolio Analysis
+### Stock selection
 
-<!-- badges: start -->
-<!-- badges: end -->
+The complete code for this project is available at `Investment-Portafolio-Analysis.R`
 
-The goal of Investment-Portfolio is to ...
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+First we will take a series of stocks with which we are going to analyze. These actions were a personal choice but the analysis can be performed with any set of actions. Future projects will explore methods for choosing a portfolio of financial assets. 
+The shares selected with their corresponding percentages are in the portfolio the following:
 
-```{r cars}
-summary(cars)
+STOCKS        | WEIGHT 
+------------- | ------------- 
+TSLA          | 25% 
+AAPL          | 25% 
+AMZN          | 20%
+NFLX          | 15%
+GOOG          | 15%
+
+Let's take a look at the dataset to see what format it will take.
+
+```{r, echo = FALSE}
+head(datos)
 ```
+***
+### Statistics and portfolio return
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
-
-You can also embed plots, for example:
+A series of calculations and analyses were made on the data in order to obtain the cumulative return of the portfolio.
 
 ```{r pressure, echo = FALSE}
-plot(pressure)
+Retorno_Individual <- datos %>%
+  group_by(symbol) %>%
+  tq_transmute( mutate_fun = periodReturn,
+               select = adjusted, period = "daily", col_rename = "Ret")
+agrupacion <- tibble(symbol = acciones, wts = weights)
+ret_data <- left_join(Retorno_Individual , agrupacion, by = 'symbol')
+ret_porc <- ret_data %>% mutate(retornopp = wts * Ret)
+port_ret <- ret_porc %>% group_by(date) %>% summarise(port_ret = sum(retornopp))
+port_cumulative_ret <- port_ret %>% mutate(cr= cumprod(1 + port_ret))
+port_cumulative_ret %>%
+  ggplot(aes(x = date, y = cr)) +
+  geom_line() +
+  labs(x = 'Date',
+       y = 'Cumulative Returns',
+       title = 'Portfolio Cumulative Returns') +
+  theme_classic() +
+  scale_y_continuous(breaks = seq(1,2,0.1)) +
+  scale_x_date(date_breaks = 'year',
+               date_labels = '%Y')
+print("The portfolio return is %")
+Por_anual <- port_cumulative_ret %>% 
+  tq_performance(Ra = port_ret,
+                 performance_fun = Return.annualized)
+cat("The average annual portfolio returns is ", round((Por_anual[[1]] * 100),2),"%", sep = "")
+vola_d <- sd(port_cumulative_ret$port_ret)                    
+cat("The daily portfolio volatility is", round((vola_d),4))
+vola_a <- vola_d *sqrt(252)
+SR <- Por_anual$AnnualizedReturn / vola_a
+SRA <- port_cumulative_ret %>% tq_performance(Ra = port_ret, performance_fun = SharpeRatio.annualized) %>% .[[1]]
+cat("The annual portfolio sharpe ratio calculated using the tq_performance function is", round((SRA),4))
+
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub.
+

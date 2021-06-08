@@ -1,36 +1,52 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Investment-Portfolio
+# Investment-Portfolio Analysis
 
-<!-- badges: start -->
-<!-- badges: end -->
+### Stock selection
 
-The goal of Investment-Portfolio is to …
+The complete code for this project is available at
+`Investment-Portafolio-Analysis.R`
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+First we will take a series of stocks with which we are going to
+analyze. These actions were a personal choice but the analysis can be
+performed with any set of actions. Future projects will explore methods
+for choosing a portfolio of financial assets. The shares selected with
+their corresponding percentages are in the portfolio the following:
 
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
+| STOCKS | WEIGHT |
+|--------|--------|
+| TSLA   | 25%    |
+| AAPL   | 25%    |
+| AMZN   | 20%    |
+| NFLX   | 15%    |
+| GOOG   | 15%    |
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this. You could also
-use GitHub Actions to re-render `README.Rmd` every time you push. An
-example workflow can be found here:
-<https://github.com/r-lib/actions/tree/master/examples>.
+Let’s take a look at the dataset to see what format it will take.
 
-You can also embed plots, for example:
+    ## # A tibble: 6 x 8
+    ##   symbol date        open  high   low close   volume adjusted
+    ##   <chr>  <date>     <dbl> <dbl> <dbl> <dbl>    <dbl>    <dbl>
+    ## 1 TSLA   2011-01-03  5.37  5.4   5.18  5.32  6415000     5.32
+    ## 2 TSLA   2011-01-04  5.33  5.39  5.20  5.33  5937000     5.33
+    ## 3 TSLA   2011-01-05  5.30  5.38  5.24  5.37  7233500     5.37
+    ## 4 TSLA   2011-01-06  5.37  5.6   5.36  5.58 10306000     5.58
+    ## 5 TSLA   2011-01-07  5.6   5.72  5.58  5.65 11239500     5.65
+    ## 6 TSLA   2011-01-10  5.63  5.74  5.61  5.69  6713500     5.69
+
+------------------------------------------------------------------------
+
+### Statistics and portfolio return
+
+A series of calculations and analyses were made on the data in order to
+obtain the cumulative return of the portfolio.
 
 ![](README_files/figure-gfm/pressure-1.png)<!-- -->
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub.
+    ## [1] "The portfolio return is %"
+
+    ## The average annual portfolio returns is 41.4%
+
+    ## The daily portfolio volatility is 0.0173
+
+    ## The annual portfolio sharpe ratio calculated using the tq_performance function is 1.5043
